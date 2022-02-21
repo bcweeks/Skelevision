@@ -105,7 +105,7 @@ This section will guide you through downloading the dataset, the pretrained mode
 
 The data will be available on https://skelevision.net/. Please download the data and extract the data in the /data/ such that the structure from the directory looks like this. 
 
-The pretrained model will be available here. Please place the model_final.pth in the following structure shown below. 
+The pretrained model will be available [here](https://drive.google.com/drive/folders/15So_b7EMK90vxRyfk_UQl75Ir10GAL7b?usp=sharing). Please place the model_final.pth in the following structure shown below. 
 
 - data
     - Training_Images
