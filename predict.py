@@ -1,5 +1,4 @@
 import os
-os.environ["CUDA_VISIBLE_DEVICES"]='0'
 
 import torch, torchvision
 import detectron2
@@ -20,16 +19,31 @@ import matplotlib.pyplot as plt
 
 
 from detectron2.data.datasets import register_coco_instances
-register_coco_instances("test_ignore", {}, "../_datasets/skeletor_dataset/via_ut_test_coco_ignore.json", "../_datasets/skeletor_dataset/test_ignore/")
+register_coco_instances("test_ignore", {}, "annotations/oct_2021_annotation.json", "data/processed_images")
+
+from detectron2.utils.visualizer import ColorMode
+import glob
+from tqdm import tqdm
+import csv
+from math import atan2, cos, sin, sqrt, pi
+import numpy as np
+import cv2
+import json
 
 from detectron2.engine import DefaultTrainer
 from detectron2.config import get_cfg
 import os
 import argparse
 
+DEVICE = None
 
-def predict(model, image_dir):
+
+def predict(model_dir, image_dir, output_dir):
+
+    #! LOAD MODEL SETTINGS
     cfg = get_cfg()
+    if DEVICE is not None and DEVICE == 'cpu':
+        cfg.MODEL.DEVICE='cpu'
     cfg.merge_from_file(model_zoo.get_config_file("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml"))
     cfg.DATASETS.TEST = ()
     cfg.TEST.EVAL_PERIOD = 100
@@ -41,22 +55,13 @@ def predict(model, image_dir):
     cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = 512
     cfg.MODEL.ROI_HEADS.NUM_CLASSES = 19
 
-    cfg.OUTPUT_DIR = '../_experiments/mask_rcnn_2021_oct_syn_latest'
+    cfg.OUTPUT_DIR = model_dir
 
 
-    '''SAVE ALL IMAGE PREDICTIONS'''
-    from detectron2.utils.visualizer import ColorMode
-    import glob
-    from tqdm import tqdm
-    import csv
-    from math import atan2, cos, sin, sqrt, pi
-    import numpy as np
-    import cv2
-    import json
-
+    #! DEFINE MODEL SETTINGS 
     ###############
     # ROI THRESHOLD DEFAULT=.8
-    TH = .3
+    TH = .8
     # NMS THRESHOLD DEFAULT=.5
     NMS = .5
     ###############
@@ -70,27 +75,25 @@ def predict(model, image_dir):
     MetadataCatalog.get("test_ignore").thing_colors = [(244,67,54), (233,30,99), (156,39,176), (103,58,183), (63,81,181), (33,150,243), (3,169,244), (0,188,212), (0,150,136), (76,175,80), (139,195,74), (205,220,57), (255,235,59), (255,193,7), (255,152,0), (255,87,34), (121,85,72), (158,158,158), (96,125,139)]
     test_metadata = MetadataCatalog.get("test_ignore")
 
-    in_dir = '/w/zhizhuo/bones_2/rgb_lg/'
-    ###############
-    # MEASURE ONLY HUMAN VALIDATION SET
-    # in_dir = '/Pool1/users/zhizhuo/bones/_datasets/skeletor_dataset/human_val_2/'
-    ###############
+    #! SET INPUT IMAGES AND OUTPUT DIRECTORY
+    in_dir = image_dir + '/'
     img_list = glob.glob(in_dir + '*.jpg')
-    out_dir = '../_datasets/outputs/raw/'
+    out_dir = output_dir
     if not os.path.exists(out_dir):
         os.mkdir(out_dir)
     else:
         pass
+    print('found', len(img_list), 'images')
 
     ###########################
     # CSV OUTPUT DIR
-    out_addr = f'../_datasets/outputs/oct_2021_latest.csv'
+    out_addr = f'{output_dir}/measurements.csv'
     # JSON OUT DIR
-    json_out = f'../_datasets/outputs/oct_2021_latest.json'
+    json_out = f'{output_dir}/measurements_cache.json'
     # SEG IMAGES OUTPUT DIR
-    dump_dir = f'../_results/oct_2021_latest/'
+    dump_dir = f'{output_dir}/'
     ###########################
-    lg_dir = '/w/zhizhuo/bones_2/rgb_lg/'
+    lg_dir = f'{image_dir}/'
     class_list = ['carpometacarpus','coracoid','femur','fibula','furcula','humerus','keel','metacarpal_4','metatarsus','other','radius','sclerotic_ring','second_digit_p_1','second_digit_p_2','skull','sternum','tarsus','ulna','not_bone']
     csv_columns = ['bone_id', 'keel-1', 'humerus-1', 'ulna-1', 'radius-1', 'carpometacarpus-1',
                 'femur-1', 'tarsus-1', 'metatarsus-1', 'sclerotic_ring-1', 'skull-1', 'second_digit_p_1-1']
@@ -98,6 +101,7 @@ def predict(model, image_dir):
     web_db_json = {}
     ###########################
 
+    print('starting to predict images...')
     result_dict = {}
     for d in tqdm(img_list):
         rgb = cv2.imread(d.replace(in_dir, lg_dir))
@@ -259,8 +263,17 @@ def predict(model, image_dir):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("-g", "--gpu", default=0, metavar='n', help="gpu id", required=False)
-    parser.add_argument("-m", "--model", default='simp', metavar='s', help="model", required=True)
+    parser.add_argument("-g", "--gpu", default=-1, metavar='n', help="gpu id", required=False)
+    parser.add_argument("-m", "--model", default='', metavar='s', help="model", required=True)
     parser.add_argument("-d", "--dir", default='', metavar='s', help="directory of images to predict", required=True)
-    parser.add_argument("-o", "--output", default='', metavar='s', help="output directory", required=True)
-    model = predict()
+    parser.add_argument("-o", "--output", default='output/', metavar='s', help="output directory", required=False)
+    args = parser.parse_args()
+
+    if str(args.gpu) == '-1':
+        DEVICE = 'cpu'
+        print('using cpu...\nthis may be slow, gpu is recommended')
+    else:
+        os.environ["CUDA_VISIBLE_DEVICES"]=str(args.gpu)
+        print('using cuda device', args.gpu, '...')
+
+    model = predict(args.model, args.dir, args.output)

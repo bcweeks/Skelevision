@@ -25,7 +25,14 @@
         <li><a href="#installation">Installation</a></li>
       </ul>
     </li>
-    <li><a href="#usage">Usage</a></li>
+    <li>
+      <a href="#usage">Usage</a>
+      <ul>
+        <li><a href="#getting-data-and-model">Getting Data and Model</a></li>
+        <li><a href="#measuring-bones">Measuring Bones</a></li>
+        <li><a href="#training">Training</a></li>
+      </ul>
+    </li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
   </ol>
@@ -45,22 +52,35 @@ We adapt recent deep nerual network approaches in computer vision to enable high
 <!-- GETTING STARTED -->
 ## Getting Started
 
-Coming soon.
+This section will guide you through installing the required dependencies and running the Skelevision model. 
 
 ### Prerequisites
 
-We recommend creating a Python virutal environment or conda enviroment and installing the required prerequisites. 
+We recommend creating a conda environment and installing the required prerequisites there. 
 
-```python3.8 -m venv /DESIRED/PATH/```
+To install miniconda:
 
-```source activate /DESIRED/PATH/```
+- Visit [miniconda](https://docs.conda.io/en/latest/miniconda.html) website
+- Download the corresponding .sh file for your system
+- Linux:
+    - ```chmod +x {Miniconda3-latest-Linux-x86_64.sh}```
+    - ```./ {Miniconda3-latest-Linux-x86_64.sh}```
+    - ```export PATH="/home/{username}/miniconda/bin:$PATH"```
+    - ```source ~/.zshrc```
+
+Make sure to replace the file names in {} with the right ones for your installation. Verify the installation of conda by typing "conda -V" in the command prompt, which should show the conda version installed. 
+
+Create a new conda environment:
+
+- ```conda create --name skelevision-env python=3.8```
+- ```conda activate skelevision-env```
 
 We require the installation of the following dependicies from their respective websites:
 
 - PyTorch (https://pytorch.org/get-started/locally/)
 - Detectron2 (https://detectron2.readthedocs.io/en/latest/tutorials/install.html)
 
-We recommend installing GPU versions of PyTorch / Detectron2. 
+We recommend installing GPU versions of PyTorch / Detectron2.
 
 ### Installation
 
@@ -76,8 +96,51 @@ After installing PyTorch and Detectron2, we need to install a few more dependenc
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-Coming soon.
+This section will guide you through downloading the dataset, the pretrained model, and measuring bones. 
 
+### Getting Data and Model
+
+The data will be available on https://skelevision.net/. Please download the data and extract the data in the /data/ such that the structure from the directory looks like this. 
+
+The pretrained model will be available here. Please place the model_final.pth in the following structure shown below. 
+
+- data
+    - Training_Images
+        - UMMZ_22510
+        - UMMZ_
+    - processed_images (created after running process_data.py)
+        - 22510.jpg
+        - ******.jpg
+- models
+    - oct_2021
+        - model_final.pth
+- annotations
+    - oct_2021_annotations.json
+- README.md
+- predict.py
+- ...
+
+Finally, run the script to process data:
+
+```python process_data.py```
+
+### Measuring Bones
+
+After setting up the data and model folders above, we can run some predictions. 
+
+```python predict.py -m models/oct_2021 -d data/processed_images -g -1```
+
+The parameters to predict.py are below:
+
+- -m [model checkpoint folder] REQURIED, folder that contains model_final.pth
+- -d [image directory] REQUIRED, we will predict on all images in this directory
+- -o [output directory] DEFAULT, output/
+- -g [gpu] DEFAULT -1 for CPU, or GPU id
+- -c [pixel to mm conversion constant] DEFAULT 0.2309mm/pixel
+
+### Training
+
+Coming soon.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -86,7 +149,7 @@ Coming soon.
 <!-- LICENSE -->
 ## License
 
-Coming soon. 
+[skelevision.net](https://skelevision.net/)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -95,7 +158,7 @@ Coming soon.
 <!-- CONTACT -->
 ## Contact
 
-Coming soon. 
+[skelevision.net](https://skelevision.net/)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
