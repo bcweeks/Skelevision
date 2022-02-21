@@ -49,13 +49,24 @@ Coming soon.
 
 ### Prerequisites
 
-Coming soon.
+We recommend creating a Python virutal environment or conda enviroment and installing the required prerequisites. 
 
-```python3.8 -m venv /mnt/d/skelevision```
+```python3.8 -m venv /DESIRED/PATH/```
+
+```source activate /DESIRED/PATH/```
+
+We require the installation of the following dependicies from their respective websites:
+
+- PyTorch (https://pytorch.org/get-started/locally/)
+- Detectron2 (https://detectron2.readthedocs.io/en/latest/tutorials/install.html)
+
+We recommend installing GPU versions of PyTorch / Detectron2. 
 
 ### Installation
 
-Coming soon.
+After installing PyTorch and Detectron2, we need to install a few more dependencies.
+
+```pip install -r requirements.txt```
 
 
 <p align="right">(<a href="#top">back to top</a>)</p>
