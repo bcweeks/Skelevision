@@ -36,9 +36,77 @@ import os
 import argparse
 
 DEVICE = None
+DOWNSCALE = 4
+
+def export_csv(input_json_addr, output_csv_addr):
+    with open(input_json_addr, 'r') as fp:
+        db = json.load(fp)
+
+    bone_list =  ['carpometacarpus','coracoid','femur','fibula','furcula','humerus','keel','metacarpal_4','metatarsus','radius','sclerotic_ring',
+                'second_digit_p_1','second_digit_p_2','skull','sternum','tarsus','ulna', 'other', 'not_bone'];
+
+    csv_columns = ['bone_id', 'carpometacarpus-1','carpometacarpus-2','coracoid-1', 'femur-1', 'femur-2', 'fibula-1', 'fibula-2',
+                    'furcula-1', 'humerus-1', 'humerus-2', 'keel-1', 'metatarsus-1', 'metatarsus-2', 'radius-1', 'radius-2',
+                    'sclerotic_ring-1', 'sclerotic_ring-2', 'second_digit_p_1-1', 'second_digit_p_2-1', 'skull-1',
+                    'sternum-1', 'tarsus-1', 'tarsus-2', 'ulna-1', 'ulna-2']
+
+    csv_columns = ['bone_id', 'carpometacarpus-1', 'carpometacarpus-1-bprob', 'carpometacarpus-2', 
+                        'carpometacarpus-2-bprob', 'coracoid-1', 'coracoid-1-bprob', 'femur-1', 'femur-1-bprob', 'femur-2', 
+                        'femur-2-bprob', 'fibula-1', 'fibula-1-bprob', 'fibula-2', 'fibula-2-bprob', 'furcula-1', 'furcula-1-bprob', 
+                        'humerus-1', 'humerus-1-bprob', 'humerus-2', 'humerus-2-bprob', 'keel-1', 'keel-1-bprob', 'metatarsus-1', 
+                        'metatarsus-1-bprob', 'metatarsus-2', 'metatarsus-2-bprob', 'radius-1', 'radius-1-bprob', 'radius-2', 
+                        'radius-2-bprob', 'sclerotic_ring-1', 'sclerotic_ring-1-bprob', 'sclerotic_ring-2', 'sclerotic_ring-2-bprob', 
+                        'second_digit_p_1-1', 'second_digit_p_1-1-bprob', 'second_digit_p_2-1', 'second_digit_p_2-1-bprob', 'skull-1', 
+                        'skull-1-bprob', 'sternum-1', 'sternum-1-bprob', 'tarsus-1', 'tarsus-1-bprob', 'tarsus-2', 'tarsus-2-bprob', 
+                        'ulna-1', 'ulna-1-bprob', 'ulna-2', 'ulna-2-bprob']
+
+    temp_dict = {}
+    for b in bone_list:
+        temp_dict[b] = 0
+
+    temp_row_dict = {}
+    for c in csv_columns:
+        temp_row_dict[c] = ''
 
 
-def predict(model_dir, image_dir, output_dir):
+    csv_list = []
+
+    for sk in db:
+
+        temp = {}
+        for b in bone_list:
+            temp[b] = 0
+
+        row_dict = {}
+        for c in csv_columns:
+            row_dict[c] = ''
+
+        for b in db[sk]:
+            bindex = 0
+            for bid in db[sk][b]:
+                temp[b] += 1
+                col_name = b + '-' + str(temp[b])
+                if col_name in row_dict:
+                    row_dict[col_name] = str(float(db[sk][b][bindex]['dist_0']))
+
+                col_prob_name = col_name + '-bprob'
+                if col_prob_name in row_dict:
+                    row_dict[col_prob_name] = bid['bprob']
+                bindex += 1
+
+        row_dict['bone_id'] = sk.replace('skeleton-','')
+        csv_list.append(row_dict)
+
+    with open(output_csv_addr, 'w') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
+        writer.writeheader()
+        for data in csv_list:
+            writer.writerow(data)
+
+    print("Finished exporting", len(csv_list), "measurements.")
+
+
+def predict(model_dir, image_dir, output_dir, px_to_mm):
 
     #! LOAD MODEL SETTINGS
     cfg = get_cfg()
@@ -54,7 +122,6 @@ def predict(model_dir, image_dir, output_dir):
     cfg.SOLVER.MAX_ITER = 12000 #6000
     cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = 512
     cfg.MODEL.ROI_HEADS.NUM_CLASSES = 19
-
     cfg.OUTPUT_DIR = model_dir
 
 
@@ -84,10 +151,12 @@ def predict(model_dir, image_dir, output_dir):
     else:
         pass
     print('found', len(img_list), 'images')
+    global DOWNSCALE
 
     ###########################
     # CSV OUTPUT DIR
-    out_addr = f'{output_dir}/measurements.csv'
+    out_addr = f'{output_dir}/measurements_cache.csv'
+    export_csv_addr = f'{output_dir}/measurements.csv'
     # JSON OUT DIR
     json_out = f'{output_dir}/measurements_cache.json'
     # SEG IMAGES OUTPUT DIR
@@ -105,7 +174,8 @@ def predict(model_dir, image_dir, output_dir):
     result_dict = {}
     for d in tqdm(img_list):
         rgb = cv2.imread(d.replace(in_dir, lg_dir))
-        img = cv2.resize(rgb, (1368, 912))
+        h, w, _ = rgb.shape
+        img = cv2.resize(rgb, (rgb.shape[1]//DOWNSCALE, rgb.shape[0]//DOWNSCALE))
         boneid = d.replace(in_dir,'').replace('.jpg','')
         
         scores = {'keel':0, 'humerus':0, 'ulna':0, 'radius':0, 'carpometacarpus':0, 'femur':0, 'tarsus':0, 'metatarsus':0,
@@ -221,7 +291,7 @@ def predict(model_dir, image_dir, output_dir):
                 continue
             
             px_dist = np.sqrt(np.square(leftmost[0] - rightmost[0]) + np.square(leftmost[1] - rightmost[1]))
-            mm_dist = (px_dist / 110 * 25.4) / 4
+            mm_dist = (px_dist * px_to_mm) / DOWNSCALE
             str_dist = '{0:.2f}'.format(mm_dist)
             
             '''CROP IMAGE'''
@@ -261,12 +331,15 @@ def predict(model_dir, image_dir, output_dir):
 
     print('Predictions saved:', len(web_db_json))
 
+    export_csv(json_out, export_csv_addr)
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("-g", "--gpu", default=-1, metavar='n', help="gpu id", required=False)
     parser.add_argument("-m", "--model", default='', metavar='s', help="model", required=True)
     parser.add_argument("-d", "--dir", default='', metavar='s', help="directory of images to predict", required=True)
     parser.add_argument("-o", "--output", default='output/', metavar='s', help="output directory", required=False)
+    parser.add_argument("-c", "--constant", default=float(25.4/110), metavar='n', help="pixel to mm constant", required=False)
     args = parser.parse_args()
 
     if str(args.gpu) == '-1':
@@ -276,4 +349,4 @@ if __name__ == '__main__':
         os.environ["CUDA_VISIBLE_DEVICES"]=str(args.gpu)
         print('using cuda device', args.gpu, '...')
 
-    model = predict(args.model, args.dir, args.output)
+    model = predict(args.model, args.dir, args.output, float(args.constant))

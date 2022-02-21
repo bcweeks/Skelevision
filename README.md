@@ -39,11 +39,14 @@
 </details>
 
 
+![CV Workflow](media/cv_workflow.jpg)
+
+
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-We adapt recent deep nerual network approaches in computer vision to enable high throughput measurement of functional traits on museum skeletal specimens.
+We adapt recent deep nerual network approaches in computer vision to enable high throughput measurement of functional traits on museum skeletal specimens. This repository will provide code and link to bird skeleton images. We hope that this will accelerate and inspire large scale study of functional traits on museum skeletal specimens. 
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -137,6 +140,8 @@ The parameters to predict.py are below:
 - -o [output directory] DEFAULT, output/
 - -g [gpu] DEFAULT -1 for CPU, or GPU id
 - -c [pixel to mm conversion constant] DEFAULT 0.2309mm/pixel
+
+Do not change -c when using data provided by skelevision.net. 
 
 ### Training
 
