@@ -46,7 +46,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-We adapt recent deep nerual network approaches in computer vision to enable high throughput measurement of functional traits on museum skeletal specimens. This repository will provide code and link to bird skeleton images. We hope that this will accelerate and inspire large scale study of functional traits on museum skeletal specimens. 
+We adapt recent deep neural network approaches in computer vision to enable high throughput measurement of functional traits on museum bird skeletal specimens. This repository provides the necessary code and links to the necessary bird skeleton images to train and test the model. For more detail, please see Weeks et al. 2022. A deep neural network for high throughput measurement of functional traits on museum skeletal specimens. _Methods in Ecology and Evolution._ 
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -78,7 +78,7 @@ Create a new conda environment:
 - ```conda create --name skelevision-env python=3.8```
 - ```conda activate skelevision-env```
 
-We require the installation of the following dependicies from their respective websites:
+We require the installation of the following dependencies from their respective websites:
 
 - PyTorch (https://pytorch.org/get-started/locally/)
 - Detectron2 (https://detectron2.readthedocs.io/en/latest/tutorials/install.html)
@@ -87,7 +87,7 @@ We recommend installing GPU versions of PyTorch / Detectron2.
 
 ### Installation
 
-After installing PyTorch and Detectron2, we need to install a few more dependencies.
+After installing PyTorch and Detectron2, you'll need to install a few more dependencies.
 
 ```pip install -r requirements.txt```
 
