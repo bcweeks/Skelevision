@@ -105,7 +105,7 @@ This section will guide you through downloading the dataset, the pretrained mode
 
 The data will be available on https://skelevision.net/ or via [this link on deepblue](https://deepblue.lib.umich.edu/data/concern/data_sets/7w62f853v). Please download the data and extract the data in the /data/ such that the structure from the directory looks like this. 
 
-The pretrained model will be available [here](https://drive.google.com/drive/folders/15So_b7EMK90vxRyfk_UQl75Ir10GAL7b?usp=sharing). Please place the model_final.pth in the following structure shown below. 
+The pretrained model is available at models/oct_2021/model_final.pth. Please place the model_final.pth in the following structure shown below. 
 
 - data
     - Training_Images
@@ -145,7 +145,7 @@ Do not change -c when using data provided by skelevision.net.
 
 ### Training
 
-To train a new model from scratch, we require 1) an annotation file in COCO format (a sample is provided in this repository) and 2) a folder of training images. To reproduce the pretrained model provided, please download the special version of the training dataset [here](https://drive.google.com/file/d/1ZaAwNMcA0dlv16LA5OJ0pDLgV9GFKuKV/view?usp=sharing) and extract it to data/oct_2021_train. The special training set contains synthetic images. After training, one can use predict.py to run the predictions on a folder of specimen images. 
+To train a new model from scratch, we require 1) an annotation file in COCO format (a sample is provided in this repository) and 2) a folder of training images. To reproduce the pretrained model provided, extract the synthetic, augmented training set at data/oct_2021_train.zip it to data/oct_2021_train/. The special training set contains synthetic images. After training, one can use predict.py to run the predictions on a folder of specimen images. 
 
 Run the training script like this. 
 
