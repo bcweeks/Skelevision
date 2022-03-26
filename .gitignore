@@ -1,5 +1,4 @@
-data/
+data/*/
 temp/
 output/
-models/*/
-*.pth
+models/train*/
