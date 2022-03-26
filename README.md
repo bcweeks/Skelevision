@@ -103,7 +103,7 @@ This section will guide you through downloading the dataset, the pretrained mode
 
 ### Getting Data and Model
 
-The data will be available on https://skelevision.net/. Please download the data and extract the data in the /data/ such that the structure from the directory looks like this. 
+The data will be available on https://skelevision.net/ or via [this link on deepblue](https://deepblue.lib.umich.edu/data/concern/data_sets/7w62f853v). Please download the data and extract the data in the /data/ such that the structure from the directory looks like this. 
 
 The pretrained model will be available [here](https://drive.google.com/drive/folders/15So_b7EMK90vxRyfk_UQl75Ir10GAL7b?usp=sharing). Please place the model_final.pth in the following structure shown below. 
 
@@ -145,7 +145,19 @@ Do not change -c when using data provided by skelevision.net.
 
 ### Training
 
-Coming soon.
+To train a new model from scratch, we require 1) an annotation file in COCO format (a sample is provided in this repository) and 2) a folder of training images. To reproduce the pretrained model provided, please download the special version of the training dataset [here](https://drive.google.com/file/d/1ZaAwNMcA0dlv16LA5OJ0pDLgV9GFKuKV/view?usp=sharing) and extract it to data/oct_2021_train. The special training set contains synthetic images. After training, one can use predict.py to run the predictions on a folder of specimen images. 
+
+Run the training script like this. 
+
+```python train.py -a annotations/oct_2021_train_annotation.json -d data/oct_2021_train -g 0```
+
+The parameters to train.py are below:
+
+- -a [annotation file] REQURIED, provided annotation file (or custom one)
+- -d [image directory] REQUIRED, directory of training images
+- -o [output directory] DEFAULT models/train, directory for model checkpoints
+- -g [gpu] DEFAULT 0, GPU id (cpu not recommended for training)
+- -i [iteration] DEFAULT 40000, training iterations (for debugging 6k is ok)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
