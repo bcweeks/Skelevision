@@ -145,7 +145,7 @@ Do not change -c when using data provided by skelevision.net.
 
 ### Training
 
-To train a new model from scratch, we require 1) an annotation file in COCO format (a sample is provided in this repository) and 2) a folder of training images. To reproduce the pretrained model provided, extract the synthetic, augmented training set at data/oct_2021_train.zip it to data/oct_2021_train/. The special training set contains synthetic images. After training, one can use predict.py to run the predictions on a folder of specimen images. 
+To train a new model from scratch, we require 1) an annotation file in COCO format (a sample is provided in this repository) and 2) a folder of training images. To reproduce the pretrained model provided, extract the synthetic, augmented training set at data/oct_2021_train.zip to data/oct_2021_train/. The special training set contains synthetic images. After training, one can use predict.py to run the predictions on a folder of specimen images. 
 
 Run the training script like this. 
 
