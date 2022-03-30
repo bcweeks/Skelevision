@@ -1,3 +1,4 @@
+from argparse import ArgumentParser
 import os
 import cv2
 import json
@@ -19,7 +20,7 @@ def convert_image(input_addr):
     cv2.imwrite(PROCESSED_IMG_DIR + skeleton_id + '.jpg', rgb, [int(cv2.IMWRITE_JPEG_QUALITY), 95])
 
 
-def process_data(root_dir='data/Training_Images/'):
+def process_data(root_dir='data/Training_Images/', use_parallel=False):
     '''
     Main function to convert all images to JPG and validate annotation file
     '''
@@ -63,8 +64,11 @@ def process_data(root_dir='data/Training_Images/'):
     
     #! CONVERT IAMGES TIFF TO JPG
     print(f'processing {len(process_list)} images')
-    process_map(convert_image, process_list, max_workers=4, chunksize=1)
-    
+    if use_parallel:
+        process_map(convert_image, process_list, max_workers=4, chunksize=1)
+    else:
+        for item in tqdm(process_list):
+            convert_image(item)
     
     #! UPDATE PROCESSED IMAGES LIST
     existing = set()
@@ -97,4 +101,8 @@ def process_data(root_dir='data/Training_Images/'):
     
 
 if __name__ == '__main__':
-    process_data()
+    parser = ArgumentParser()
+    parser.add_argument("-p", "--parallel", action='store_true')
+    args = parser.parse_args()
+    print('using parallel processing: ', args.parallel)
+    process_data(use_parallel=args.parallel)
