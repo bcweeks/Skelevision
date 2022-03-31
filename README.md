@@ -103,7 +103,7 @@ This section will guide you through downloading the dataset, the pretrained mode
 
 ### Getting Data and Model
 
-The data will be available on https://skelevision.net/ or via [this link on deepblue](https://deepblue.lib.umich.edu/data/concern/data_sets/7w62f853v). Please download the data and extract the data in the /data/ such that the structure from the directory looks like this. 
+The data are available via [this link on deepblue](https://deepblue.lib.umich.edu/data/concern/data_sets/7w62f853v). Please download the data and extract the data in the /data/ such that the structure from the directory looks like this. 
 
 The pretrained model is available at models/oct_2021/model_final.pth. Please place the model_final.pth in the following structure shown below. 
 
